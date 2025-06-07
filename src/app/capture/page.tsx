@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { saveUserData, saveEmailLead } from '@/lib/firebase';
 import { calculateScores } from '@/utils/quiz';
-import { questions } from '@/data/questions';
 
-export default function CapturePage() {
+function CapturePageContent() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [gender, setGender] = useState('');
@@ -296,5 +295,17 @@ export default function CapturePage() {
         </main>
       </div>
     </>
+  );
+}
+
+export default function CapturePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex-center">
+        <div className="loading" />
+      </div>
+    }>
+      <CapturePageContent />
+    </Suspense>
   );
 } 

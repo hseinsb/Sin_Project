@@ -9,7 +9,7 @@ import Link from 'next/link';
 export default function ResultPage() {
   const params = useParams();
   const router = useRouter();
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<{name: string; result: string} | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const sin = params.sin as Sin;
@@ -31,7 +31,7 @@ export default function ResultPage() {
         return;
       }
       setUserData(data);
-    } catch (error) {
+    } catch {
       router.push('/');
       return;
     } finally {
@@ -177,7 +177,7 @@ export default function ResultPage() {
         {/* Footer quote */}
         <div className="text-center mt-16">
           <p className="text-gray-500 text-sm italic max-w-2xl mx-auto">
-            "One does not become enlightened by imagining figures of light, but by making the darkness conscious."
+            &ldquo;One does not become enlightened by imagining figures of light, but by making the darkness conscious.&rdquo;
           </p>
           <p className="text-gray-600 text-xs mt-2">— Carl Jung</p>
         </div>

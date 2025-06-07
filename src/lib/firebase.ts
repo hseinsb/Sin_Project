@@ -19,34 +19,41 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Validate that all required environment variables are present
-const requiredEnvVars = [
-  'NEXT_PUBLIC_FIREBASE_API_KEY',
-  'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-  'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-  'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
-  'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-  'NEXT_PUBLIC_FIREBASE_APP_ID'
-];
-
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-if (missingVars.length > 0) {
-  throw new Error(`Missing required environment variables: ${missingVars.join(', ')}. Please check your .env.local file.`);
-}
-
-
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Analytics (only on client side)
-let analytics;
+// Validate that all required environment variables are present (only in browser)
 if (typeof window !== 'undefined') {
-  analytics = getAnalytics(app);
+  const requiredEnvVars = [
+    'NEXT_PUBLIC_FIREBASE_API_KEY',
+    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+    'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
+    'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
+    'NEXT_PUBLIC_FIREBASE_APP_ID'
+  ];
+
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  if (missingVars.length > 0) {
+    console.error(`Missing required environment variables: ${missingVars.join(', ')}. Please check your .env.local file.`);
+  }
 }
 
-// Initialize Firestore
-const db = getFirestore(app);
+
+
+// Initialize Firebase (only if we have the required config)
+let app: ReturnType<typeof initializeApp> | null = null;
+let analytics: ReturnType<typeof getAnalytics> | null = null;
+let db: ReturnType<typeof getFirestore> | null = null;
+
+if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+  app = initializeApp(firebaseConfig);
+  
+  // Initialize Analytics (only on client side)
+  if (typeof window !== 'undefined') {
+    analytics = getAnalytics(app);
+  }
+  
+  // Initialize Firestore
+  db = getFirestore(app);
+}
 
 // Database functions
 export const saveUserData = async (data: {
@@ -59,6 +66,10 @@ export const saveUserData = async (data: {
   answers: number[];
   submittedAt: string;
 }) => {
+  if (!db) {
+    throw new Error('Firebase not initialized. Please check your environment variables.');
+  }
+  
   try {
     const docRef = await addDoc(collection(db, "users"), {
       ...data,
@@ -79,6 +90,10 @@ export const saveEmailLead = async (data: {
   sinResult: string;
   source: string;
 }) => {
+  if (!db) {
+    throw new Error('Firebase not initialized. Please check your environment variables.');
+  }
+  
   try {
     const docRef = await addDoc(collection(db, "email_leads"), {
       ...data,

@@ -294,7 +294,7 @@ export default function EmailCapturePage() {
       <div className="mt-12 max-w-lg text-center relative z-10 fade-in" style={{ animationDelay: '0.5s' }}>
         <div className="glass-effect rounded-2xl p-6">
           <p className="text-gray-300 text-lg italic leading-relaxed">
-            "Everything that irritates us about others can lead us to an understanding of ourselves."
+            &ldquo;Everything that irritates us about others can lead us to an understanding of ourselves.&rdquo;
           </p>
           <p className="text-amber-400 text-sm mt-2 font-medium">— Carl Jung</p>
         </div>

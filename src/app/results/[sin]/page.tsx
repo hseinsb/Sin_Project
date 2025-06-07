@@ -1,14 +1,16 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Sin } from '@/types/quiz';
 import results from '@/data/results';
 
-export default function ResultsPage() {
+function ResultsPageContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const sin = params?.sin as Sin;
-  const email = searchParams?.get('email');
+
   const name = searchParams?.get('name');
 
   if (!sin || !results[sin]) {
@@ -116,12 +118,12 @@ export default function ResultsPage() {
                   Dive deeper into shadow work and psychological transformation.
                 </p>
                 <div className="flex-center gap-md mb-lg">
-                  <a
+                  <Link
                     href="/"
                     className="btn btn-secondary"
                   >
                     Retake Quiz
-                  </a>
+                  </Link>
                 </div>
               </div>
             </footer>
@@ -129,5 +131,17 @@ export default function ResultsPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex-center">
+        <div className="loading" />
+      </div>
+    }>
+      <ResultsPageContent />
+    </Suspense>
   );
 } 

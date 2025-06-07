@@ -5,7 +5,7 @@ import { Sin } from '@/types/quiz';
 const priority: Sin[] = ["lust", "greed", "pride", "envy", "wrath", "gluttony", "sloth"];
 
 export function calculateScores(answers: number[]): Record<Sin, number> {
-  let sinScores: Record<Sin, number> = {
+  const sinScores: Record<Sin, number> = {
     pride: 0,
     envy: 0,
     wrath: 0,

@@ -26,7 +26,7 @@ export default function HomePage() {
               <div className="space-y-lg animate-fade-in delay-200">
                 <p className="body-lg text-secondary max-w-2xl mx-auto">
                   Face your shadow. <span className="text-gradient font-semibold">Find your truth.</span> 
-                  This isn't just a quiz — it's a mirror into your unconscious mind.
+                  This isn&apos;t just a quiz — it&apos;s a mirror into your unconscious mind.
                 </p>
                 
                 <p className="body text-muted italic">
@@ -94,7 +94,7 @@ export default function HomePage() {
             <div className="max-w-3xl mx-auto mb-2xl animate-fade-in delay-700">
               <div className="card text-center">
                 <blockquote className="body-lg text-secondary italic mb-md">
-                  "Until you make the unconscious conscious, it will direct your life and you will call it fate."
+                  &ldquo;Until you make the unconscious conscious, it will direct your life and you will call it fate.&rdquo;
                 </blockquote>
                 
                 <cite className="text-gradient font-bold">— Carl Jung</cite>
