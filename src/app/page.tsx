@@ -160,6 +160,9 @@ export default function HomePage() {
                 <p className="body-sm text-muted">
                   © 2025 <span className="text-gradient font-semibold">Hussein Sbeiti</span> · All rights reserved
                 </p>
+                <p className="body-sm text-muted mt-xs">
+                  We may collect limited information to improve quiz results and user insights.
+                </p>
               </div>
             </div>
           </div>
