@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Secure user data submissions with validation
+    match /users/{docId} {
+      allow create: if request.auth == null && 
+                    resource == null &&
+                    request.resource.data.keys().hasAll(['email', 'name', 'gender', 'age', 'sinResult']) &&
+                    request.resource.data.email is string &&
+                    request.resource.data.email.matches('.*@.*\\..*') &&
+                    request.resource.data.name is string &&
+                    request.resource.data.name.size() > 0 &&
+                    request.resource.data.age is number &&
+                    request.resource.data.age > 0 &&
+                    request.resource.data.age < 150 &&
+                    // Allow optional new fields
+                    (!request.resource.data.keys().hasAny(['subtypeResult']) || request.resource.data.subtypeResult is string) &&
+                    (!request.resource.data.keys().hasAny(['subtypeScores']) || request.resource.data.subtypeScores is map) &&
+                    (!request.resource.data.keys().hasAny(['sinScores']) || request.resource.data.sinScores is map) &&
+                    (!request.resource.data.keys().hasAny(['answers']) || request.resource.data.answers is list || request.resource.data.answers is string) &&
+                    (!request.resource.data.keys().hasAny(['submittedAt']) || request.resource.data.submittedAt is string) &&
+                    (!request.resource.data.keys().hasAny(['timestamp']) || true);
+      allow read, update, delete: if false;
+    }
+
+    // Secure email leads with validation
+    match /email_leads/{docId} {
+      allow create: if request.auth == null && 
+                    resource == null &&
+                    request.resource.data.keys().hasAll(['email', 'name', 'sinResult']) &&
+                    request.resource.data.email is string &&
+                    request.resource.data.email.matches('.*@.*\\..*') &&
+                    request.resource.data.name is string &&
+                    request.resource.data.name.size() > 0 &&
+                    (!request.resource.data.keys().hasAny(['source']) || request.resource.data.source is string) &&
+                    (!request.resource.data.keys().hasAny(['timestamp']) || true);
+      allow read, update, delete: if false;
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+} 

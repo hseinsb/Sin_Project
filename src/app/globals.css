@@ -313,6 +313,46 @@ body {
   transform: translate(-50%, -50%);
 }
 
+/* ==================== CHECKBOX STYLES ==================== */
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-primary);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkbox.selected {
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple));
+  border-color: var(--accent-gold);
+}
+
+.checkbox.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  animation: scaleIn 0.2s ease;
+}
+
+/* ==================== DISABLED STATES ==================== */
+.option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.option.disabled:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-primary);
+}
+
 /* Input Fields */
 .input {
   width: 100%;

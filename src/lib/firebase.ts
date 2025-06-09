@@ -20,7 +20,7 @@ const firebaseConfig = {
 };
 
 // Validate that all required environment variables are present (only in browser)
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
   const requiredEnvVars = [
     'NEXT_PUBLIC_FIREBASE_API_KEY',
     'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
@@ -62,13 +62,17 @@ export const saveUserData = async (data: {
   gender: string;
   age: number;
   sinResult: string;
+  subtypeResult?: string;
   sinScores: Record<string, number>;
-  answers: number[];
+  subtypeScores?: Record<string, Record<string, number>>;
+  answers: number[][] | number[] | string;
   submittedAt: string;
-}) => {
-  if (!db) {
-    throw new Error('Firebase not initialized. Please check your environment variables.');
-  }
+  location?: string;
+  }) => {
+    if (!db) {
+      console.warn('Firebase not initialized. Skipping database save for development.');
+      return 'dev-mode-skip';
+    }
   
   try {
     const docRef = await addDoc(collection(db, "users"), {
@@ -91,7 +95,8 @@ export const saveEmailLead = async (data: {
   source: string;
 }) => {
   if (!db) {
-    throw new Error('Firebase not initialized. Please check your environment variables.');
+    console.warn('Firebase not initialized. Skipping email lead save for development.');
+    return 'dev-mode-skip';
   }
   
   try {

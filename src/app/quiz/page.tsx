@@ -3,46 +3,65 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { questions } from '@/data/questions';
-import { calculateScores, getDominantSin } from '@/utils/quiz';
+import { calculateQuizResult } from '@/utils/quiz';
 
 export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<number[]>([]);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<number[][]>([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const router = useRouter();
 
-  const progress = ((currentQuestion + (selectedAnswer !== null ? 1 : 0)) / questions.length) * 100;
+  const question = questions[currentQuestion];
+  const maxSelections = question.maxSelections;
+  const progress = ((currentQuestion + (selectedAnswers.length > 0 ? 1 : 0)) / questions.length) * 100;
 
   useEffect(() => {
-    setSelectedAnswer(null);
+    setSelectedAnswers([]);
   }, [currentQuestion]);
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (isAnimating) return;
-    setSelectedAnswer(answerIndex);
+    
+    setSelectedAnswers(prev => {
+      // If already selected, remove it
+      if (prev.includes(answerIndex)) {
+        return prev.filter(i => i !== answerIndex);
+      }
+      
+      // If at max selections, replace the oldest selection
+      if (prev.length >= maxSelections) {
+        const newSelections = [...prev];
+        newSelections.shift(); // Remove first (oldest) selection
+        newSelections.push(answerIndex);
+        return newSelections;
+      }
+      
+      // Otherwise, add the new selection
+      return [...prev, answerIndex];
+    });
   };
 
   const handleNext = () => {
-    if (selectedAnswer === null || isAnimating) return;
+    if (selectedAnswers.length === 0 || isAnimating) return;
 
     setIsAnimating(true);
     
-    const newAnswers = [...answers, selectedAnswer];
+    const newAnswers = [...answers, selectedAnswers];
     setAnswers(newAnswers);
 
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
       } else {
-        // Save answers to localStorage for the capture page
+        // Calculate results and redirect to capture
+        const result = calculateQuizResult(newAnswers);
+        
+        // Save full result to localStorage for the capture page
+        localStorage.setItem('quizResult', JSON.stringify(result));
         localStorage.setItem('quizAnswers', JSON.stringify(newAnswers));
         
-        // Calculate results and redirect to capture
-        const sinScores = calculateScores(newAnswers);
-        const dominantSin = getDominantSin(sinScores);
-        
-        router.push(`/capture?sin=${dominantSin}`);
+        router.push(`/capture?sin=${result.dominantSin}&subtype=${result.dominantSubtype}`);
       }
       setIsAnimating(false);
     }, 300);
@@ -54,8 +73,6 @@ export default function QuizPage() {
       setAnswers(answers.slice(0, -1));
     }
   };
-
-  const question = questions[currentQuestion];
 
   return (
     <>
@@ -70,6 +87,11 @@ export default function QuizPage() {
               <p className="body text-secondary">
                 Question {currentQuestion + 1} of {questions.length}
               </p>
+              {maxSelections > 1 && (
+                <p className="body-sm text-accent mt-xs">
+                  Choose up to {maxSelections} answers • {selectedAnswers.length}/{maxSelections} selected
+                </p>
+              )}
             </div>
           </div>
         </header>
@@ -109,22 +131,27 @@ export default function QuizPage() {
 
                 {/* Answer Options */}
                 <div className="space-y-md">
-                  {question.options.map((option, index) => (
-                    <div
-                      key={index}
-                      className={`option ${selectedAnswer === index ? 'selected' : ''} ${
-                        isAnimating ? 'pointer-events-none' : ''
-                      }`}
-                      onClick={() => handleAnswerSelect(index)}
-                    >
-                      <div className="flex gap-md">
-                        <div className={`radio ${selectedAnswer === index ? 'selected' : ''}`} />
-                        <span className="body text-primary flex-1">
-                          {option.text}
-                        </span>
+                  {question.options.map((option, index) => {
+                    const isSelected = selectedAnswers.includes(index);
+                    const isDisabled = !isSelected && selectedAnswers.length >= maxSelections;
+                    
+                    return (
+                      <div
+                        key={index}
+                        className={`option ${isSelected ? 'selected' : ''} ${
+                          isDisabled ? 'disabled' : ''
+                        } ${isAnimating ? 'pointer-events-none' : ''}`}
+                        onClick={() => !isDisabled && handleAnswerSelect(index)}
+                      >
+                        <div className="flex gap-md">
+                          <div className={`${maxSelections > 1 ? 'checkbox' : 'radio'} ${isSelected ? 'selected' : ''}`} />
+                          <span className="body text-primary flex-1">
+                            {option.text}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -159,9 +186,9 @@ export default function QuizPage() {
 
                 <button
                   onClick={handleNext}
-                  disabled={selectedAnswer === null || isAnimating}
+                  disabled={selectedAnswers.length === 0 || isAnimating}
                   className={`btn btn-primary ${
-                    selectedAnswer === null ? 'opacity-50 cursor-not-allowed' : ''
+                    selectedAnswers.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   {isAnimating ? (
@@ -194,8 +221,7 @@ export default function QuizPage() {
                   <h3 className="heading-3 text-gradient m-0">Quick Tip</h3>
                 </div>
                 <p className="body text-secondary m-0">
-                  Answer honestly based on your instinctive reactions. There are no right or wrong answers — 
-                  only deeper self-understanding awaits.
+                  Answer honestly based on your instinctive reactions. You can select multiple answers that resonate with you.
                 </p>
               </div>
             </div>
