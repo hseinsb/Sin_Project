@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Sin, SinScores, QuizResult } from '@/types/quiz';
+import { Sin, QuizResult } from '@/types/quiz';
 import { subtypeDetails } from '@/data/subtypes';
 
 function SubtypeResultsContent() {
@@ -107,9 +107,8 @@ function SubtypeResultsContent() {
 
   const downloadResults = async () => {
     try {
-      // Dynamically import jsPDF and html2canvas
+      // Dynamically import jsPDF
       const jsPDF = (await import('jspdf')).default;
-      const html2canvas = (await import('html2canvas')).default;
 
       // Create PDF content
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -319,7 +318,7 @@ ${result.plainEnglishGuidance}
       try {
         await navigator.clipboard.writeText(resultsText);
         alert('Results copied to clipboard! (PDF generation failed, but your results are now in your clipboard)');
-      } catch (clipboardError) {
+      } catch {
         alert('Unable to save results. Please screenshot or copy the content manually.');
       }
     }

@@ -221,7 +221,7 @@ ${result.path}
       try {
         await navigator.clipboard.writeText(resultsText);
         alert('Results copied to clipboard! (PDF generation failed, but your results are now in your clipboard)');
-      } catch (clipboardError) {
+      } catch {
         alert('Unable to save results. Please screenshot or copy the content manually.');
       }
     }

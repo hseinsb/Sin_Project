@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { saveUserData, saveEmailLead } from '@/lib/firebase';
-import { calculateScores } from '@/utils/quiz';
+// import { calculateScores } from '@/utils/quiz'; // Not used in this component
 
 function CapturePageContent() {
   const [email, setEmail] = useState('');
