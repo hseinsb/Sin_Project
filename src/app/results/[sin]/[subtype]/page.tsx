@@ -361,7 +361,7 @@ ${result.plainEnglishGuidance}
                   </p>
                   
                   <div className="space-y-md">
-                    {sinBreakdown.map((item, index) => {
+                    {sinBreakdown.map((item) => {
                       const isDominant = item.sin === sin;
                       const maxScore = sinBreakdown[0]?.score || 1;
                       const barWidth = (item.score / maxScore) * 100;
