@@ -51,6 +51,15 @@ export interface SubtypeDetails {
   plainEnglishGuidance: string;
 }
 
+export interface SinProfile {
+  sin: Sin;
+  title: string;
+  archetype: string;
+  desire: string;
+  shadow: string;
+  path: string;
+}
+
 export interface UserData {
   name: string;
   email: string;
