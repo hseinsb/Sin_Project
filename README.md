@@ -153,3 +153,5 @@ For issues or questions, please contact Hussein Sbeiti or create an issue in thi
 ---
 
 **Built with ❤️ by Hussein Sbeiti**
+
+<!-- Trigger Vercel deployment with ESLint fixes -->
